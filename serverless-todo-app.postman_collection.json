@@ -1,0 +1,216 @@
+{
+	"info": {
+		"_postman_id": "e6a2bcb2-2299-470f-96bd-0a38ccc54717",
+		"name": "Serverless TODO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all todos",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{awshost}}/dev/todos",
+					"host": [
+						"{{awshost}}"
+					],
+					"path": [
+						"dev",
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create todo",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Learn sultans of swing\",\n\t\"dueDate\": \"2019-06-11\"\n}"
+				},
+				"url": {
+					"raw": "{{awshost}}/dev/todos",
+					"host": [
+						"{{awshost}}"
+					],
+					"path": [
+						"dev",
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update todo",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Finish project\",\n\t\"dueDate\": \"2019-19-11\",\n\t\"done\": false\n}"
+				},
+				"url": {
+					"raw": "{{awshost}}/dev/todos/8a586ea6-936b-48e9-a7b3-f5ea53f37cff",
+					"host": [
+						"{{awshost}}"
+					],
+					"path": [
+						"dev",
+						"todos",
+						"8a586ea6-936b-48e9-a7b3-f5ea53f37cff"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete todo",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{awshost}}/dev/todos/8c69399b-0d72-4d6f-b71c-eba46460f7fc",
+					"host": [
+						"{{awshost}}"
+					],
+					"path": [
+						"dev",
+						"todos",
+						"8c69399b-0d72-4d6f-b71c-eba46460f7fc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get attachment URL",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{awshost}}/dev/todos/8a586ea6-936b-48e9-a7b3-f5ea53f37cff/attachment",
+					"host": [
+						"{{awshost}}"
+					],
+					"path": [
+						"dev",
+						"todos",
+						"8a586ea6-936b-48e9-a7b3-f5ea53f37cff",
+						"attachment"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "2e83c0fe-6650-44d5-a90f-4c27ff720d83",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "977c227e-2df3-42eb-9a48-ec25e2f7eeae",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "b84f1df7-4c56-4ec8-aa9d-a1a8f5304d05",
+			"key": "apiId",
+			"value": "n5fqote8nf",
+			"type": "string"
+		},
+		{
+			"id": "3cba639d-d64f-40fb-ad1b-f092967d8455",
+			"key": "authToken",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2RpcmV2aW4uYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDVlN2VlYzE1OWQ4YTE4MGM4NGQ5ODYzNyIsImF1ZCI6IlhZWE9VRGN1eEh1MWdaVEp6bHdORHBkeUI1UGNKWmFPIiwiaWF0IjoxNTg1Mzc2Mjc4LCJleHAiOjE1ODU4MDgyNzgsImF0X2hhc2giOiJnV1dNNmxtcnNiOUpPaW9BemFCM3pRIiwibm9uY2UiOiJYMU9PcFpON35tVjZYR1podG5VVjBvZnQyOUJ3ZWhvZiJ9.miepv1L8ADNLZa5sh0Euea5_ogoG0csjXjKUOq9Eehg",
+			"type": "string"
+		},
+		{
+			"id": "3f2b74f1-2b20-4994-bf74-dcad1756970a",
+			"key": "host",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"id": "c999dd4b-39ac-44bd-b4d8-a18839c7a416",
+			"key": "awshost",
+			"value": "https://n5fqote8nf.execute-api.us-east-1.amazonaws.com",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
