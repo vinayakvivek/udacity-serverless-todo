@@ -14,7 +14,9 @@ const processGetTodos: APIGatewayProxyHandler = async (event: APIGatewayProxyEve
   const items = await getTodos(authToken);
   return {
     statusCode: 200,
-    body: JSON.stringify(items)
+    body: JSON.stringify({
+      items
+    })
   }
 }
 

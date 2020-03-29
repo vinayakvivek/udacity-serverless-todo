@@ -17,7 +17,9 @@ const processCreateTodo: APIGatewayProxyHandler = async (event: APIGatewayProxyE
   const newItem = await createTodo(data, authToken);
   return {
     statusCode: 201,
-    body: JSON.stringify(newItem),
+    body: JSON.stringify({
+      item: newItem
+    }),
   }
 }
 

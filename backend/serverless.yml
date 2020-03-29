@@ -22,6 +22,9 @@ provider:
 
 custom:
 
+  serverless-offline:
+    httpPort: 3003
+
   dynamodb:
     start:
       port: 8000
@@ -37,8 +40,8 @@ custom:
 
 functions:
 
-  # Auth:
-  #   handler: src/lambda/auth/auth0Authorizer.handler
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
 
   GetTodos:
     handler: src/lambda/http/getTodos.handler
@@ -60,6 +63,7 @@ functions:
           method: post
           path: todos
           cors: true
+          authorizer: Auth
           request:
             schema:
               'application/json': ${file(models/create-todo-request.json)}
@@ -94,5 +98,15 @@ functions:
   #         path: todos/{todoId}/attachment
 
 resources:
-  Resources:
-    ${file(resources/todosTable.yml)}
+  - Resources:
+      GatewayResponseDefault4XX:
+        Type: AWS::ApiGateway::GatewayResponse
+        Properties:
+          ResponseParameters:
+            gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+            gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+          ResponseType: DEFAULT_4XX
+          RestApiId: !Ref ApiGatewayRestApi
+    
+  - ${file(resources/todosTable.yml)}
