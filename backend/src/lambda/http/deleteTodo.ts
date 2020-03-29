@@ -9,6 +9,7 @@ import { cors } from "middy/middlewares";
 
 import { createLogger } from "../../utils/logger";
 import { deleteTodo } from "../../services/deleteTodo";
+import { errorPayload } from '../utils'
 
 const logger = createLogger("Lambda:deleteTodo");
 
@@ -19,20 +20,17 @@ const processDeleteTodo: APIGatewayProxyHandler = async (
         path: event.path,
         context: event.requestContext
     });
-    const authToken = event.headers.Authorization.split(" ")[1];
-    const todoId = event.pathParameters.todoId;
 
     try {
+        const authToken = event.headers.Authorization.split(" ")[1];
+        const todoId = event.pathParameters.todoId;
         await deleteTodo(todoId, authToken);
         return {
             statusCode: 204,
             body: ''
         };
     } catch (e) {
-        return {
-            statusCode: 400,
-            body: e.message
-        };
+        return errorPayload(e.message);
     }
 };
 

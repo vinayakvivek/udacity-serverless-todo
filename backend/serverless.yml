@@ -20,6 +20,8 @@ provider:
   environment:
     TODOS_TABLE: TodoApp-${self:provider.stage}
     INDEX_NAME: TodoIdIndex
+    IMAGES_S3_BUCKET: todo-app-media-vin-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
 
 custom:
 
@@ -111,17 +113,22 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_NAME}
       - Effect: Allow
         Action:
-          - dynamodb:Delete
+          - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       
-
-  # # TODO: Configure this function
-  # GenerateUploadUrl:
-  #   handler: src/lambda/http/generateUploadUrl.handler
-  #   events:
-  #     - http:
-  #         method: post
-  #         path: todos/{todoId}/attachment
+  GenerateUploadUrl:
+    handler: src/lambda/http/generateUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: todos/{todoId}/attachment
+          cors: true
+          authorizer: Auth
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
 
 resources:
   - Resources:
@@ -136,3 +143,4 @@ resources:
           RestApiId: !Ref ApiGatewayRestApi
     
   - ${file(resources/todosTable.yml)}
+  - ${file(resources/mediaBucket.yml)}

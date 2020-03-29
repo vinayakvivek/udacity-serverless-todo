@@ -10,6 +10,7 @@ import { cors } from "middy/middlewares";
 import { createLogger } from "../../utils/logger";
 import { CreateTodoRequest } from "../../requests/CreateTodoRequest";
 import { createTodo } from "../../services/createTodo";
+import { errorPayload } from '../utils'
 
 const logger = createLogger("Lambda:createTodo");
 
@@ -20,10 +21,10 @@ const processCreateTodo: APIGatewayProxyHandler = async (
         path: event.path,
         context: event.requestContext
     });
-    const authToken = event.headers.Authorization.split(" ")[1];
-    const data: CreateTodoRequest = JSON.parse(event.body);
 
     try {
+        const authToken = event.headers.Authorization.split(" ")[1];
+        const data: CreateTodoRequest = JSON.parse(event.body);
         const newItem = await createTodo(data, authToken);
         return {
             statusCode: 201,
@@ -32,10 +33,7 @@ const processCreateTodo: APIGatewayProxyHandler = async (
             })
         };
     } catch (e) {
-        return {
-            statusCode: 400,
-            body: e.message
-        };
+        return errorPayload(e.message);
     }
 };
 
