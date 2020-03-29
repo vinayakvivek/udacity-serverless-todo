@@ -1,5 +1,5 @@
 {
-  "name": "serverless-todo-app",
+  "name": "todo-app",
   "version": "1.0.0",
   "description": "Serverless TODO image app",
   "dependencies": {
@@ -28,6 +28,6 @@
     "typescript": "^3.4.1",
     "webpack": "^4.29.6"
   },
-  "author": "Ivan Mushketyk",
+  "author": "Vinayak",
   "license": "MIT"
 }
