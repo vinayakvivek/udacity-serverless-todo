@@ -3,14 +3,18 @@ import { DocumentClient } from "aws-sdk/clients/dynamodb";
 
 import { createLogger } from "../utils/logger";
 import { TodoItem } from "../models/TodoItem";
+import { S3 } from "aws-sdk";
 
 const logger = createLogger("Connector:TodoConnector");
 
 export class TodoConnector {
     constructor(
         private readonly docClient: DocumentClient = createDyanamoDBClient(),
+        private readonly s3Client: S3 = createS3Client(),
         private readonly todosTable = process.env.TODOS_TABLE,
-        private readonly indexName = process.env.INDEX_NAME
+        private readonly indexName = process.env.INDEX_NAME,
+        private readonly bucketName = process.env.IMAGES_S3_BUCKET,
+        private readonly urlExpiry: number = parseInt(process.env.SIGNED_URL_EXPIRATION)
     ) {}
 
     async getAllTodos(userId: string): Promise<TodoItem[]> {
@@ -109,6 +113,14 @@ export class TodoConnector {
 
         return data.Items[0] as TodoItem;
     }
+
+    generateUploadURL(todoId: string) {
+        return this.s3Client.getSignedUrl('putObject', {
+            Bucket: this.bucketName,
+            Key: todoId,
+            Expires: this.urlExpiry
+        })
+    }
 }
 
 function createDyanamoDBClient() {
@@ -120,4 +132,10 @@ function createDyanamoDBClient() {
         });
     }
     return new AWS.DynamoDB.DocumentClient();
+}
+
+function createS3Client() {
+    return new AWS.S3({
+        signatureVersion: 'v4'
+    });
 }

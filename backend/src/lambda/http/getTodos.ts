@@ -9,6 +9,7 @@ import { cors } from "middy/middlewares";
 
 import { createLogger } from "../../utils/logger";
 import { getTodos } from "../../services/getTodos";
+import { errorPayload } from '../utils'
 
 const logger = createLogger("Lambda:getTodos");
 
@@ -19,8 +20,9 @@ const processGetTodos: APIGatewayProxyHandler = async (
         path: event.path,
         context: event.requestContext
     });
-    const authToken = event.headers.Authorization.split(" ")[1];
+
     try {
+        const authToken = event.headers.Authorization.split(" ")[1];
         const items = await getTodos(authToken);
         return {
             statusCode: 200,
@@ -29,10 +31,7 @@ const processGetTodos: APIGatewayProxyHandler = async (
             })
         };
     } catch (e) {
-        return {
-            statusCode: 400,
-            body: e.message
-        };
+        return errorPayload(e.message);
     }
 };
 
