@@ -10,8 +10,23 @@ export class TodoConnector {
 
     constructor(
         private readonly docClient: DocumentClient = createDyanamoDBClient(),
-        private readonly todosTable = process.env.TODOS_TABLE
+        private readonly todosTable = process.env.TODOS_TABLE,
+        private readonly indexName = process.env.INDEX_NAME
     ) { }
+
+    async getAllTodos(userId: string): Promise<TodoItem[]> {
+        logger.info('Fetching all todo items of user', {userId});
+
+        const result = await this.docClient.query({
+            TableName: this.todosTable,
+            KeyConditionExpression: "userId = :userId",
+            ExpressionAttributeValues: {
+                ":userId": userId
+            }
+        }).promise();
+
+        return result.Items as TodoItem[];
+    }
 
     async createTodo(item: TodoItem): Promise<TodoItem> {
         logger.info('Creating a Todo item', {
@@ -26,18 +41,46 @@ export class TodoConnector {
         return item;
     }
 
-    async getAllTodos(userId: string): Promise<TodoItem[]> {
-        logger.info('Fetching all todo items of user', {userId});
+    async updateTodo(item: TodoItem): Promise<TodoItem> {
 
-        const result = await this.docClient.query({
+        const data = await this.docClient.query({
             TableName: this.todosTable,
-            KeyConditionExpression: "userId = :userId",
+            IndexName: this.indexName,
+            KeyConditionExpression: "userId = :userId and todoId = :todoId",
             ExpressionAttributeValues: {
-                ":userId": userId
+                ":userId": item.userId,
+                ":todoId": item.todoId,
             }
         }).promise();
 
-        return result.Items as TodoItem[];
+        if (data.Items.length === 0) {
+            logger.info('Value does not exist', { item });
+            return null;
+        }
+
+        const key = {
+            userId: item.userId,
+            createdAt: data.Items[0].createdAt
+        }
+
+        logger.info('Updating item', { key });
+
+        const result = await this.docClient.update({
+            TableName: this.todosTable,
+            Key: key,
+            UpdateExpression: "set done = :done, #name = :name, dueDate = :dueDate",
+            ExpressionAttributeNames: {
+                "#name": "name",
+            },
+            ExpressionAttributeValues: {
+                ":done": item.done,
+                ":name": item.name,
+                ":dueDate": item.dueDate,
+            },
+            ReturnValues:"ALL_NEW"
+        }).promise();
+
+        return result.Attributes as TodoItem;
     }
 }
 
