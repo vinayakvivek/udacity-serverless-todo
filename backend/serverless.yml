@@ -4,13 +4,26 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
+  - serverless-dynamodb-local
+  - serverless-offline
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs10.x
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
+
+  environment:
+    TODOS_TABLE: Todos-${self:provider.stage}
+
+custom:
+
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
 
 functions:
 
@@ -26,7 +39,6 @@ functions:
           path: todos
 
   # TODO: Configure this function
-  GetTodos:
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
@@ -60,4 +72,4 @@ functions:
 
 resources:
   Resources:
-    # TODO: Add any necessary AWS resources
+    ${file(resources/todosTable.yml)}
