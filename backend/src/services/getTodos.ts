@@ -7,7 +7,7 @@ const logger = createLogger('Service:getTodos');
 const todoConnector = new TodoConnector();
 
 export async function getTodos(token: string): Promise<TodoItem[]> {
-    logger.info('Fetching all todos', { authToken: token });
+    logger.info('Fetching all todos');
     const userId = parseUserId(token);
     return todoConnector.getAllTodos(userId);
 }

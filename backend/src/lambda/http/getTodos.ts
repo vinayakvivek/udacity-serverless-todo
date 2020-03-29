@@ -9,7 +9,10 @@ import { getTodos } from '../../services/getTodos';
 const logger = createLogger('Lambda:getTodos');
 
 const processGetTodos: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  logger.info('Processing event', {event});
+  logger.info('Processing event', {
+    path: event.path,
+    context: event.requestContext,
+  });
   const authToken = event.headers.Authorization.split(' ')[1];
   const items = await getTodos(authToken);
   return {

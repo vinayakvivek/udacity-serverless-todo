@@ -10,14 +10,17 @@ import { updateTodo } from '../../services/updateTodo';
 const logger = createLogger('Lambda:updateTodo');
 
 const processUpdateTodo: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  logger.info('Processing event', {event});
+  logger.info('Processing event', {
+      path: event.path,
+      context: event.requestContext,
+  });
   const authToken = event.headers.Authorization.split(' ')[1];
   const data: UpdateTodoRequest = JSON.parse(event.body);
   const todoId = event.pathParameters.todoId;
 
   const updatedItem = await updateTodo(data, todoId, authToken);
   return {
-    statusCode: 201,
+    statusCode: 200,
     body: JSON.stringify({
       item: updatedItem
     }),
