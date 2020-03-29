@@ -7,6 +7,8 @@ Resources:
           AttributeType: S
         - AttributeName: createdAt
           AttributeType: S
+        - AttributeName: todoId
+          AttributeType: S
       KeySchema:
         - AttributeName: userId
           KeyType: HASH
@@ -14,3 +16,12 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
       TableName: ${self:provider.environment.TODOS_TABLE}
+      LocalSecondaryIndexes:
+        - IndexName: ${self:provider.environment.INDEX_NAME}
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+            - AttributeName: todoId
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
