@@ -14,7 +14,9 @@ export class TodoConnector {
         private readonly todosTable = process.env.TODOS_TABLE,
         private readonly indexName = process.env.INDEX_NAME,
         private readonly bucketName = process.env.IMAGES_S3_BUCKET,
-        private readonly urlExpiry: number = parseInt(process.env.SIGNED_URL_EXPIRATION)
+        private readonly urlExpiry: number = parseInt(
+            process.env.SIGNED_URL_EXPIRATION
+        )
     ) {}
 
     async getAllTodos(userId: string): Promise<TodoItem[]> {
@@ -34,10 +36,8 @@ export class TodoConnector {
     }
 
     async createTodo(item: TodoItem): Promise<TodoItem> {
-        logger.info("Creating a Todo item", {
-            todoId: item.todoId
-        });
-
+        item.attachmentUrl = `https://${this.bucketName}.s3.amazonaws.com/${item.todoId}`;
+        logger.info("Creating a Todo item", { item });
         await this.docClient
             .put({
                 TableName: this.todosTable,
@@ -115,11 +115,11 @@ export class TodoConnector {
     }
 
     generateUploadURL(todoId: string) {
-        return this.s3Client.getSignedUrl('putObject', {
+        return this.s3Client.getSignedUrl("putObject", {
             Bucket: this.bucketName,
             Key: todoId,
             Expires: this.urlExpiry
-        })
+        });
     }
 }
 
@@ -136,6 +136,6 @@ function createDyanamoDBClient() {
 
 function createS3Client() {
     return new AWS.S3({
-        signatureVersion: 'v4'
+        signatureVersion: "v4"
     });
 }
