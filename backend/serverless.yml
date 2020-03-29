@@ -7,6 +7,9 @@ plugins:
   - serverless-dynamodb-local
   - serverless-offline
 
+package:
+  individually: true
+
 provider:
   name: aws
   runtime: nodejs10.x
