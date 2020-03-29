@@ -16,10 +16,13 @@ const processCreateTodo: APIGatewayProxyHandler = async (event: APIGatewayProxyE
 
   const newItem = await createTodo(data, authToken);
   return {
-    statusCode: 200,
-    body: JSON.stringify(newItem)
+    statusCode: 201,
+    body: JSON.stringify(newItem),
   }
 }
 
-export const handler = middy(processCreateTodo)
-  .use(cors())
+export const handler = middy(processCreateTodo);
+  
+handler.use(cors({
+    credentials: true
+}))

@@ -2,12 +2,12 @@ TodosDynamoDBTable:
   Type: AWS::DynamoDB::Table
   Properties:
     AttributeDefinitions:
-      - AttributeName: todoId
+      - AttributeName: userId
         AttributeType: S
       - AttributeName: createdAt
         AttributeType: S
     KeySchema:
-      - AttributeName: todoId
+      - AttributeName: userId
         KeyType: HASH
       - AttributeName: createdAt
         KeyType: RANGE

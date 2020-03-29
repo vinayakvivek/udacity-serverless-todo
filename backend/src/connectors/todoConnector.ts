@@ -25,6 +25,20 @@ export class TodoConnector {
 
         return item;
     }
+
+    async getAllTodos(userId: string): Promise<TodoItem[]> {
+        logger.info('Fetching all todo items of user', {userId});
+
+        const result = await this.docClient.query({
+            TableName: this.todosTable,
+            KeyConditionExpression: "userId = :userId",
+            ExpressionAttributeValues: {
+                ":userId": userId
+            }
+        }).promise();
+
+        return result.Items as TodoItem[];
+    }
 }
 
 function createDyanamoDBClient() {
