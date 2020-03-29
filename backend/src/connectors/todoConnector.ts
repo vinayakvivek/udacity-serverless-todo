@@ -1,4 +1,5 @@
 import * as AWS from "aws-sdk";
+import * as AWSXray from "aws-xray-sdk";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 
 import { createLogger } from "../utils/logger";
@@ -6,6 +7,7 @@ import { TodoItem } from "../models/TodoItem";
 import { S3 } from "aws-sdk";
 
 const logger = createLogger("Connector:TodoConnector");
+const XAWS = AWSXray.captureAWS(AWS);
 
 export class TodoConnector {
     constructor(
@@ -135,7 +137,7 @@ function createDyanamoDBClient() {
 }
 
 function createS3Client() {
-    return new AWS.S3({
+    return new XAWS.S3({
         signatureVersion: "v4"
     });
 }

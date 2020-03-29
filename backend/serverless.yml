@@ -6,6 +6,7 @@ plugins:
   - serverless-iam-roles-per-function
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-plugin-tracing
 
 # package:
 #   individually: true
@@ -13,6 +14,10 @@ plugins:
 provider:
   name: aws
   runtime: nodejs10.x
+
+  tracing:
+    lambda: true
+    apiGateway: true
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
@@ -22,6 +27,14 @@ provider:
     INDEX_NAME: TodoIdIndex
     IMAGES_S3_BUCKET: todo-app-media-vin-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
+
+  iamRoleStatements:
+    - Effect: "Allow" # xray permissions (required)
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource:
+        - "*"
 
 custom:
 
