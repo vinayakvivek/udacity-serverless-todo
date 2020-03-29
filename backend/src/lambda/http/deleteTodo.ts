@@ -8,12 +8,11 @@ import * as middy from "middy";
 import { cors } from "middy/middlewares";
 
 import { createLogger } from "../../utils/logger";
-import { CreateTodoRequest } from "../../requests/CreateTodoRequest";
-import { createTodo } from "../../services/createTodo";
+import { deleteTodo } from "../../services/deleteTodo";
 
-const logger = createLogger("Lambda:createTodo");
+const logger = createLogger("Lambda:deleteTodo");
 
-const processCreateTodo: APIGatewayProxyHandler = async (
+const processDeleteTodo: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     logger.info("Processing event", {
@@ -21,15 +20,13 @@ const processCreateTodo: APIGatewayProxyHandler = async (
         context: event.requestContext
     });
     const authToken = event.headers.Authorization.split(" ")[1];
-    const data: CreateTodoRequest = JSON.parse(event.body);
+    const todoId = event.pathParameters.todoId;
 
     try {
-        const newItem = await createTodo(data, authToken);
+        await deleteTodo(todoId, authToken);
         return {
-            statusCode: 201,
-            body: JSON.stringify({
-                item: newItem
-            })
+            statusCode: 204,
+            body: ''
         };
     } catch (e) {
         return {
@@ -39,7 +36,7 @@ const processCreateTodo: APIGatewayProxyHandler = async (
     }
 };
 
-export const handler = middy(processCreateTodo);
+export const handler = middy(processDeleteTodo);
 
 handler.use(
     cors({
