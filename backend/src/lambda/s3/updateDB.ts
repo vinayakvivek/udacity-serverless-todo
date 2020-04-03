@@ -11,12 +11,8 @@ const logger = createLogger("Lambda:updateOnS3Upload");
 
 const processUpdateDBOnS3Upload: S3Handler = async (event: S3Event) => {
     for (const record of event.Records) {
-        logger.info("Processing record", {key: record.s3.object.key});
+        logger.info("Processing record", {record});
     }
 };
-
-// function processRecord(key: string) {
-
-// }
 
 export const handler = middy(processUpdateDBOnS3Upload);

@@ -38,7 +38,6 @@ export class TodoConnector {
     }
 
     async createTodo(item: TodoItem): Promise<TodoItem> {
-        item.attachmentUrl = `https://${this.bucketName}.s3.amazonaws.com/${item.todoId}`;
         logger.info("Creating a Todo item", { item });
         await this.docClient
             .put({
@@ -116,11 +115,12 @@ export class TodoConnector {
         return data.Items[0] as TodoItem;
     }
 
-    async generateUploadURL(todoId: string, userId: string) {
+    async generateUploadURL(todoId: string, userId: string, fileName: string) {
         await this.getByTodoId(userId, todoId);
+        const s3Key = `${userId}/${todoId}/${fileName}`
         return this.s3Client.getSignedUrl("putObject", {
             Bucket: this.bucketName,
-            Key: todoId,
+            Key: s3Key,
             Expires: this.urlExpiry
         });
     }

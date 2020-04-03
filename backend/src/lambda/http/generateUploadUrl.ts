@@ -9,7 +9,7 @@ import { cors } from "middy/middlewares";
 
 import { createLogger } from "../../utils/logger";
 import { generateUploadURL } from '../../services/generateUploadUrl'
-import { errorPayload } from '../utils'
+import { errorPayload, getUserId } from '../utils'
 
 const logger = createLogger("Lambda:generateUploadURL");
 
@@ -22,9 +22,10 @@ const processGenerateUploadURL: APIGatewayProxyHandler = async (
     });
 
     try {
-        const authToken = event.headers.Authorization.split(" ")[1];
+        const userId = getUserId(event);
         const todoId = event.pathParameters.todoId;
-        const url = await generateUploadURL(todoId, authToken);
+        const fileName = event.pathParameters.fileName;
+        const url = await generateUploadURL(todoId, userId, fileName);
         return {
             statusCode: 200,
             body: JSON.stringify({
