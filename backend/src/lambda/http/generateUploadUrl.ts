@@ -22,8 +22,9 @@ const processGenerateUploadURL: APIGatewayProxyHandler = async (
     });
 
     try {
+        const authToken = event.headers.Authorization.split(" ")[1];
         const todoId = event.pathParameters.todoId;
-        const url = generateUploadURL(todoId);
+        const url = await generateUploadURL(todoId, authToken);
         return {
             statusCode: 200,
             body: JSON.stringify({

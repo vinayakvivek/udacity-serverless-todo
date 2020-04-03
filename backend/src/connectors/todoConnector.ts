@@ -116,7 +116,8 @@ export class TodoConnector {
         return data.Items[0] as TodoItem;
     }
 
-    generateUploadURL(todoId: string) {
+    async generateUploadURL(todoId: string, userId: string) {
+        await this.getByTodoId(userId, todoId);
         return this.s3Client.getSignedUrl("putObject", {
             Bucket: this.bucketName,
             Key: todoId,
