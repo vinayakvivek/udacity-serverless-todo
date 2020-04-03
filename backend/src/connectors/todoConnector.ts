@@ -1,24 +1,16 @@
 import * as AWS from "aws-sdk";
-import * as AWSXray from "aws-xray-sdk";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 
 import { createLogger } from "../utils/logger";
 import { TodoItem } from "../models/TodoItem";
-import { S3 } from "aws-sdk";
 
 const logger = createLogger("Connector:TodoConnector");
-const XAWS = AWSXray.captureAWS(AWS);
 
 export class TodoConnector {
     constructor(
         private readonly docClient: DocumentClient = createDyanamoDBClient(),
-        private readonly s3Client: S3 = createS3Client(),
         private readonly todosTable = process.env.TODOS_TABLE,
-        private readonly indexName = process.env.INDEX_NAME,
-        private readonly bucketName = process.env.IMAGES_S3_BUCKET,
-        private readonly urlExpiry: number = parseInt(
-            process.env.SIGNED_URL_EXPIRATION
-        )
+        private readonly indexName = process.env.INDEX_NAME
     ) {}
 
     async getAllTodos(userId: string): Promise<TodoItem[]> {
@@ -39,6 +31,7 @@ export class TodoConnector {
 
     async createTodo(item: TodoItem): Promise<TodoItem> {
         logger.info("Creating a Todo item", { item });
+        item.attachmentUrls = [];
         await this.docClient
             .put({
                 TableName: this.todosTable,
@@ -94,6 +87,30 @@ export class TodoConnector {
             .promise();
     }
 
+    async addAttachmentUrl(userId: string, todoId: string, url: string) {
+        const itemData = await this.getByTodoId(userId, todoId);
+
+        const key = {
+            userId: userId,
+            createdAt: itemData.createdAt
+        };
+
+        logger.info("Updating item", { key });
+
+        await this.docClient
+            .update({
+                TableName: this.todosTable,
+                Key: key,
+                UpdateExpression:
+                    "set attachmentUrls = list_append(attachmentUrls, :newUrl)",
+                ExpressionAttributeValues: {
+                    ":newUrl": [url]
+                },
+                ReturnValues: "ALL_NEW"
+            })
+            .promise();
+    }
+
     async getByTodoId(userId: string, todoId: string): Promise<TodoItem> {
         const data = await this.docClient
             .query({
@@ -114,16 +131,6 @@ export class TodoConnector {
 
         return data.Items[0] as TodoItem;
     }
-
-    async generateUploadURL(todoId: string, userId: string, fileName: string) {
-        await this.getByTodoId(userId, todoId);
-        const s3Key = `${userId}/${todoId}/${fileName}`
-        return this.s3Client.getSignedUrl("putObject", {
-            Bucket: this.bucketName,
-            Key: s3Key,
-            Expires: this.urlExpiry
-        });
-    }
 }
 
 function createDyanamoDBClient() {
@@ -135,10 +142,4 @@ function createDyanamoDBClient() {
         });
     }
     return new AWS.DynamoDB.DocumentClient();
-}
-
-function createS3Client() {
-    return new XAWS.S3({
-        signatureVersion: "v4"
-    });
 }

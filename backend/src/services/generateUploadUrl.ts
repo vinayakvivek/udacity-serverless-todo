@@ -1,10 +1,10 @@
 import { createLogger } from '../utils/logger';
-import { TodoConnector } from '../connectors/todoConnector';
+import { S3Connector } from '../connectors/s3Connector';
 
 const logger = createLogger('Service:generateUploadURL');
-const todoConnector = new TodoConnector();
+const s3Connector = new S3Connector();
 
 export async function generateUploadURL(todoId: string, userId: string, fileName: string): Promise<string> {
     logger.info('Generating upload URL', {todoId});
-    return todoConnector.generateUploadURL(todoId, userId, fileName);
+    return s3Connector.generateUploadURL(todoId, userId, fileName);
 }
