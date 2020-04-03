@@ -143,6 +143,14 @@ functions:
           - s3:PutObject
         Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
 
+  UpdateDBOnS3Upload:
+    handler: src/lambda/s3/updateDB.handler
+    events:
+      - s3:
+          bucket: ${self:provider.environment.IMAGES_S3_BUCKET}
+          event: s3:ObjectCreated:*
+          existing: true
+
 resources:
   - Resources:
       GatewayResponseDefault4XX:
