@@ -58,6 +58,8 @@ functions:
 
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
+    environment:
+      AUTH0_CERT_URL: https://direvin.auth0.com/cer
 
   GetTodos:
     handler: src/lambda/http/getTodos.handler
