@@ -9,9 +9,11 @@ A simple TODO application using AWS Lambda and Serverless framework.
 
 # Functionality of the application
 
-- This application will allow creating/removing/updating/fetching TODO items. Each TODO item can optionally have an attachment image. Each user only has access to TODO items that he/she has created.
-- Each TODO can have multiple attachments
-- If a TODO is deleted, related attachments are deleted from S3, by a lambda function which is triggered by DynamoDB stream
+- This application will allow creating/removing/updating/fetching TODO items. 
+- Each user only has access to TODO items that he/she has created.
+- Each TODO can have multiple attachments (zero or more).
+- If a TODO is deleted, related attachments are deleted from S3, by a lambda function which is triggered by DynamoDB stream.
+- For authentication, Auth0 public certificate is fetched and cached (instead of hard-coding the value).
 
 ## Sample screenshot
 ![sample](images/sample.png)
