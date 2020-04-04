@@ -13,6 +13,9 @@ A simple TODO application using AWS Lambda and Serverless framework.
 - Each TODO can have multiple attachments
 - If a TODO is deleted, related attachments are deleted from S3, by a lambda function which is triggered by DynamoDB stream
 
+## Sample screenshot
+![sample](images/sample.png)
+
 # How to run the application
 
 ```
