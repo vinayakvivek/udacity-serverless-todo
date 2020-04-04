@@ -164,6 +164,23 @@ functions:
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
+  DeleteS3DataOnDelete:
+    handler: src/lambda/db/deleteS3Data.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn: !GetAtt TodosDynamoDBTable.StreamArn
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:DeleteObject
+        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
+      - Effect: Allow
+        Action:
+          - s3:ListBucket
+        Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}
+
+
 resources:
   - Resources:
       GatewayResponseDefault4XX:

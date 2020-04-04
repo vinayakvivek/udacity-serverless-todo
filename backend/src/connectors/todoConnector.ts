@@ -95,7 +95,7 @@ export class TodoConnector {
             createdAt: itemData.createdAt
         };
 
-        logger.info("Updating item", { key });
+        logger.info("Adding attachement url", { key });
 
         await this.docClient
             .update({

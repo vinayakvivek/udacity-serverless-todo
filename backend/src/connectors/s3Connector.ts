@@ -8,7 +8,7 @@ import { TodoConnector } from "./todoConnector";
 const logger = createLogger("Connector:S3Connector");
 const XAWS = AWSXray.captureAWS(AWS);
 
-const todoConnector = new TodoConnector();
+let todoConnector;
 
 export class S3Connector {
 
@@ -21,6 +21,9 @@ export class S3Connector {
     ) {}
 
     async generateUploadURL(todoId: string, userId: string, fileName: string) {
+        if (!todoConnector) {
+            todoConnector = new TodoConnector();
+        }
         await todoConnector.getByTodoId(userId, todoId);
         const s3Key = `${userId}/${todoId}/${fileName}`;
         logger.info("Generating PUT url", {key: s3Key});
@@ -29,6 +32,36 @@ export class S3Connector {
             Key: s3Key,
             Expires: this.urlExpiry
         });
+    }
+
+    async deleteAttachments(userId: string, todoId: string) {
+        const dir = `${userId}/${todoId}/`;
+        await this.deleteFolderContents(dir);
+    }
+
+    async deleteFolderContents(folder: string) {
+        logger.info("Deleting folder contents", {folder});
+
+        const listedObjects = await this.s3Client.listObjectsV2({
+            Bucket: this.bucketName,
+            Prefix: folder
+        }).promise();
+        
+        if (listedObjects.Contents.length === 0) return;
+        
+        const deleteParams = {
+            Bucket: this.bucketName,
+            Delete: { Objects: [] }
+        };
+    
+        listedObjects.Contents.forEach(({ Key }) => {
+            logger.info("Fetching to delete", {Key});
+            deleteParams.Delete.Objects.push({ Key });
+        });
+
+        await this.s3Client.deleteObjects(deleteParams).promise();
+
+        if (listedObjects.IsTruncated) await this.deleteFolderContents(folder);
     }
 }
 
